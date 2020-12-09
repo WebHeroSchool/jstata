@@ -1,12 +1,34 @@
+let loader = document.getElementById('loader');
+let load = function() {
+	loader.style.display = 'none';
+}
+
 let url = window.location.toString();
 let arr = url.split('=');
 let userName = arr[1];
 if (userName == undefined) {
     userName = 'Tatyana888-star';
 }
-console.log(userName);
-fetch(`https://api.github.com/users/${userName}`).then(res => res.json()).then(json => {
-    console.log(json);
+
+const getDate = new Promise((resolve, reject) => {
+	setTimeout(() => {
+		load();
+		const dataDiv = document.createElement('div');
+		dataDiv.textContent = `Текущая дата: ${Date()}`;
+		document.body.append(dataDiv);
+		resolve();
+	}, 3000);
+});
+const getName = new Promise((resolve, reject) => {
+	setTimeout(() => userName ? resolve(userName) : reject('имя не найдено'), 2000);
+});
+
+Promise.all([getDate, getName])
+	.then(() => fetch(`https://api.github.com/users/${userName}`))
+	.then(res => res.json())
+	.then(json => {
+		console.log(json);
+
     const img = document.createElement('img');
     img.src = json.avatar_url;
     img.alt = 'Avatar';
